@@ -101,8 +101,6 @@ def map():
         previous_phq_attendance_features = fetch_features(location["lat"], location["lon"], radius, date_from=previous_date_from, date_to=previous_date_to, features=features)
         previous_phq_attendance_sum = calc_sum_of_features(previous_phq_attendance_features, features)
 
-        st.write(previous_phq_attendance_sum)
-
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
