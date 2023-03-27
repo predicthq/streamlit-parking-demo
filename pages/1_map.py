@@ -27,13 +27,13 @@ def map():
         return
     
     st.header(location["name"])
-    st.caption(f"{location['lat']}, {location['lon']}")
+    # st.caption(f"{location['lat']}, {location['lon']}")
     
     suggested_radius = fetch_suggested_radius(location["lat"], location["lon"])
 
     with st.container():
         # Allow changing the radius if needed (default to suggested radius)
-        radius = st.slider("Radius around parking building in miles", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="Events will be fetched within this radius around the parking building.")
+        radius = st.sidebar.slider("Radius around parking building (in miles)", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="Events will be fetched within this radius around the parking building.")
 
     with st.container():
         # Allow selecting categories
@@ -64,15 +64,17 @@ def map():
         categories = attended_categories + non_attended_categories + unscheduled_categories
         default_categories = attended_categories
 
-        selected_categories = st.multiselect("Event categories", options=categories, default=default_categories, help="[Event Categories Docs](https://docs.predicthq.com/resources/events)")
+        selected_categories = st.sidebar.multiselect("Event categories", options=categories, default=default_categories, help="[Event Categories Docs](https://docs.predicthq.com/resources/events)")
 
-    if len(daterange) == 2:
+    if daterange is not None:
+        date_from = daterange["date_from"]
+        date_to = daterange["date_to"]
         # Work out previous date range for comparisons
-        previous_date_from = daterange[0] - (daterange[1] - daterange[0])
-        previous_date_to = daterange[0]
+        previous_date_from = date_from - (date_to - date_from)
+        previous_date_to = date_from
 
         # Fetch event counts/stats
-        counts = fetch_event_counts(location["lat"], location["lon"], radius, date_from=daterange[0], date_to=daterange[1])
+        counts = fetch_event_counts(location["lat"], location["lon"], radius, date_from=date_from, date_to=date_to)
         attended_events_sum = calc_sum_of_event_counts(counts, attended_categories)
         non_attended_events_sum = calc_sum_of_event_counts(counts, non_attended_categories)
 
@@ -94,7 +96,7 @@ def map():
             "phq_attendance_sports",
             # "phq_attendance_school_holidays",
         ]
-        phq_attendance_features = fetch_features(location["lat"], location["lon"], radius, date_from=daterange[0], date_to=daterange[1], features=features)
+        phq_attendance_features = fetch_features(location["lat"], location["lon"], radius, date_from=date_from, date_to=date_to, features=features)
         phq_attendance_sum = calc_sum_of_features(phq_attendance_features, features)
 
         # Fetch previous predicted attendance
@@ -118,9 +120,8 @@ def map():
             delta_pct = (non_attended_events_sum - previous_non_attended_events_sum) / previous_non_attended_events_sum * 100
             st.metric(label="Non-Attended Events", value=non_attended_events_sum, delta=f"{delta_pct:,.0f}%", help=f"Total number of non-attended events in the selected date range. Previous period: {previous_non_attended_events_sum}.")
 
-    
         # Fetch events
-        events = fetch_events(location["lat"], location["lon"], radius, date_from=daterange[0], date_to=daterange[1], categories=selected_categories)
+        events = fetch_events(location["lat"], location["lon"], radius, date_from=date_from, date_to=date_to, categories=selected_categories)
         
         show_map(lat=location["lat"], lon=location["lon"], events=events)
 

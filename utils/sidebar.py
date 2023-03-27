@@ -33,9 +33,26 @@ def show_sidebar_options():
 
     # Prepare the date range (today + 30d as the default)
     today = datetime.date.today()
-    min_date = today
-    max_date = today + datetime.timedelta(days=90)
-    st.sidebar.date_input("Events Date Range", value=(today, today + datetime.timedelta(days=30)), min_value=min_date, max_value=max_date, help="Select the date range for fetching event data (defaults to next 30 days).", disabled=get_api_key() is None, key="daterange")
+    date_options = [
+        {
+            "name": "Next 7 days",
+            "date_from": today,
+            "date_to": today + datetime.timedelta(days=7)
+        },
+        {
+            "name": "Next 30 days",
+            "date_from": today,
+            "date_to": today + datetime.timedelta(days=30)
+        },
+        {
+            "name": "Next 90 days",
+            "date_from": today,
+            "date_to": today + datetime.timedelta(days=90)
+        }
+    ]
+
+    index = date_options.index(st.session_state.daterange) if "daterange" in st.session_state else 0
+    st.sidebar.selectbox("Date Range", date_options, index=index, format_func=lambda x: x["name"], help="Select the date range for fetching event data.", disabled=get_api_key() is None, key="daterange")
 
 
     
