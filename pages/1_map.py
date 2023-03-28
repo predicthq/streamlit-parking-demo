@@ -32,40 +32,40 @@ def map():
     
     suggested_radius = fetch_suggested_radius(location["lat"], location["lon"])
 
-    with st.container():
-        # Allow changing the radius if needed (default to suggested radius)
-        radius = st.sidebar.slider("Suggested Radius around parking building (mi)", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)")
+    # Allow changing the radius if needed (default to suggested radius)
+    radius = st.sidebar.slider("Suggested Radius around parking building (mi)", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)")
 
-    with st.container():
-        # Allow selecting categories
-        attended_categories = [
-            "community",
-            "concerts",
-            "conferences",
-            "expos",
-            "festivals",
-            "performing-arts",
-            "sports",
-        ]
-        non_attended_categories = [
-            "academic",
-            "daylight-savings",
-            "observances",
-            "politics",
-            "public-holidays",
-            "school-holidays",
-        ]
-        unscheduled_categories = [
-            "airport-delays",
-            "disasters",
-            "health-warnings",
-            "severe-weather",
-            "terror",
-        ]
-        categories = attended_categories + non_attended_categories + unscheduled_categories
-        default_categories = attended_categories
+    # Allow selecting categories
+    attended_categories = [
+        "community",
+        "concerts",
+        "conferences",
+        "expos",
+        "festivals",
+        "performing-arts",
+        "sports",
+    ]
+    non_attended_categories = [
+        "academic",
+        "daylight-savings",
+        "observances",
+        "politics",
+        "public-holidays",
+        "school-holidays",
+    ]
+    unscheduled_categories = [
+        "airport-delays",
+        "disasters",
+        "health-warnings",
+        "severe-weather",
+        "terror",
+    ]
+    categories = attended_categories + non_attended_categories + unscheduled_categories
+    default_categories = attended_categories
 
-        selected_categories = st.sidebar.multiselect("Event categories", options=categories, default=default_categories, help="[Event Categories Docs](https://docs.predicthq.com/resources/events)")
+    selected_categories = st.sidebar.multiselect("Event categories", options=categories, default=default_categories, help="[Event Categories Docs](https://docs.predicthq.com/resources/events)")
+
+    st.sidebar.caption("Get the code for this app at [GitHub](https://github.com/predicthq/streamlit-parking-demo)")
 
     if daterange is not None:
         date_from = daterange["date_from"]
@@ -137,7 +137,6 @@ def map():
         
         # Show map and convert radius miles to meters (the map only supports meters)
         show_map(lat=location["lat"], lon=location["lon"], radius_meters=radius * 1609, events=events)
-
 
         show_events_list(events)
 
