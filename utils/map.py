@@ -1,25 +1,16 @@
 import streamlit as st
-import pandas as pd
 import pydeck as pdk
 
 def show_map(lat, lon, radius_meters, events):
     COLOR_RANGE = [
-        [246, 213, 141],
-        [246, 198, 132],
-        [246, 184, 124],
-        [246, 169, 115],
-        [245, 155, 107],
-        [245, 140, 98],
-        [245, 126, 90],
-        [245, 111, 81],
-        [245, 96, 72],
-        [245, 82, 64],
-        [244, 67, 55],
-        [244, 53, 47],
-        [244, 38, 38],
+        [255, 174, 0],
+        [255, 138, 25],
+        [255, 104, 49],
+        [255, 69, 74],
+        [255, 35, 100],
     ]
 
-    BREAKS = [100, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000]
+    BREAKS = [20, 40, 60, 80, 100]
 
     def color_scale(val):
         for i, b in enumerate(BREAKS):
@@ -27,26 +18,24 @@ def show_map(lat, lon, radius_meters, events):
                 return COLOR_RANGE[i]
         return COLOR_RANGE[i]
     
-    point_results = []
+    geojson_features = []
 
     for event in events["results"]:
-        row = {
+        geojson_features.append({
+            "type": "Feature",
+            "geometry": event["geo"]["geometry"],
+
+            # NOTE: Not valid GeoJSON, but required for pydeck tooltips (which cannot use properties.* format)
+            "title": event["title"],
             "id": event["id"],
             "title": event["title"],
             "phq_attendance": event["phq_attendance"] if event["phq_attendance"] else "0",
             "phq_attendance_formatted": "{:,}".format(event["phq_attendance"]) if event["phq_attendance"] else "0",
+            "phq_rank": event["rank"],
+            "local_rank": event["local_rank"],
             "category": event["category"],
-            "lat": event["geo"]["geometry"]["coordinates"][1],
-            "lon": event["geo"]["geometry"]["coordinates"][0],
-            "fill_color": color_scale(event["phq_attendance"] if event["phq_attendance"] else 0),
-        } if event["geo"]["geometry"]["type"] == "Point" else None
-
-        if row:
-            point_results.append(row)
-
-    point_events_df = pd.DataFrame(point_results)
-
-    # TODO - non-point events
+            "fill_color": color_scale(event["local_rank"] if event["local_rank"] else 0),
+        })
 
     
     st.pydeck_chart(pdk.Deck(
@@ -55,6 +44,8 @@ def show_map(lat, lon, radius_meters, events):
             "html": """
                 <p><b>{title}</b></p>
                 Predicted Attendance: {phq_attendance_formatted}<br />
+                PHQ Rank: {phq_rank}<br />
+                Local Rank: {local_rank}<br />
                 Category: {category}
             """,
         },
@@ -62,46 +53,54 @@ def show_map(lat, lon, radius_meters, events):
             latitude=lat,
             longitude=lon,
             zoom=14,
-            pitch=50,
         ),
         layers=[
+            # Radius layer
             pdk.Layer(
-                'ScatterplotLayer',
+                "ScatterplotLayer",
                 data=[{"coordinates": [lon, lat], "radius": radius_meters}],
                 get_position="coordinates",
-                # radius_units="meters",
                 filled=True,
-                # stroked=True,
-                get_color='[24, 161, 99, 40]',
+                # get_fill_color="[24, 161, 99, 40]",
+                get_fill_color="[0, 140, 211, 40]",
                 get_radius="radius",
             ),
+
+            # Center point layer
             pdk.Layer(
-                "ColumnLayer",
-                data=point_events_df,
-                get_position=["lon", "lat"],
+                "ScatterplotLayer",
+                data=[{"coordinates": [lon, lat], "radius": radius_meters}],
+                get_position="coordinates",
+                filled=True,
+                get_fill_color="[0, 140, 211, 150]",
+                get_radius=40,
+            ),
+
+            # Point-type events layer
+            pdk.Layer(
+                "GeoJsonLayer",
+                data=list(filter(lambda x: x["geometry"]["type"] == "Point", geojson_features)),
                 auto_highlight=True,
                 pickable=True,
-                extruded=True,
-                get_elevation="phq_attendance / 30",
-                opacity=0.8,
-                radius=10,
-                stroked=False,
                 filled=True,
                 get_fill_color="fill_color",
+                stroked=False,
+                opacity=0.8,
+                get_point_radius=20,
             ),
-            # pdk.Layer(
-            #     'GeoJsonLayer',
-            #     data=geojson_features,
-            #     # get_position=["lon", "lat"],
-            #     auto_highlight=True,
-            #     pickable=True,
-            #     get_fill_color='[200, 30, 0, 160]',
-            #     get_radius=1,
-            #     opacity=0.8,
-            #     # extruded=True,
-            #     # get_elevation="properties.phq_attendance / 200",
-            # ),
+
+            # Polygon-type events layer
+            pdk.Layer(
+                "GeoJsonLayer",
+                data=list(filter(lambda x: x["geometry"]["type"] != "Point", geojson_features)),
+                auto_highlight=True,
+                pickable=True,
+                filled=True,
+                stroked=True,
+                get_line_color="fill_color",
+                get_fill_color="fill_color",
+                opacity=0.1,
+                get_line_width=10,
+            ),
         ],
     ))
-
-    # st.map(df)
