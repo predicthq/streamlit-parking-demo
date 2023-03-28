@@ -34,7 +34,7 @@ def map():
 
     with st.container():
         # Allow changing the radius if needed (default to suggested radius)
-        radius = st.sidebar.slider("Radius around parking building (in miles)", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="Events will be fetched within this radius around the parking building.")
+        radius = st.sidebar.slider("Suggested Radius around parking building (mi)", 0.0, 10.0, suggested_radius.get("radius", 2.0), 0.1, help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)")
 
     with st.container():
         # Allow selecting categories
@@ -135,7 +135,8 @@ def map():
         # Fetch events
         events = fetch_events(location["lat"], location["lon"], radius, date_from=date_from, date_to=date_to, categories=selected_categories)
         
-        show_map(lat=location["lat"], lon=location["lon"], events=events)
+        # Show map and convert radius miles to meters (the map only supports meters)
+        show_map(lat=location["lat"], lon=location["lon"], radius_meters=radius * 1609, events=events)
 
 
         show_events_list(events)
@@ -266,7 +267,7 @@ def show_events_list(events):
     csv = convert_df(events_df)
 
     st.download_button(
-        label="Download events as CSV",
+        label="✅ Download events as CSV",
         data=csv,
         file_name='events.csv',
         mime='text/csv',

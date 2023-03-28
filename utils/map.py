@@ -1,15 +1,8 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import pydeck as pdk
 
-def show_map(lat, lon, events):
-    # df = pd.DataFrame(
-    #     np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-    #     columns=['lat', 'lon'])
-
-    # TODO - convert events to a dataframe
-    # when displaying layer, filter for just point types and then on polygon layer filter just for polygons...
+def show_map(lat, lon, radius_meters, events):
     COLOR_RANGE = [
         [246, 213, 141],
         [246, 198, 132],
@@ -55,36 +48,6 @@ def show_map(lat, lon, events):
 
     # TODO - non-point events
 
-
-    # geojson_features = []
-
-    # for event in events["results"]:
-    #     geojson_features.append({
-    #         "type": "Feature",
-    #         # "geometry": {
-    #         #     "type": event["geo"]["geometry"]["type"],
-    #         #     "coordinates": [event["geo"]["geometry"]["coordinates"][1], event["geo"]["geometry"]["coordinates"][0]],
-    #         # },
-    #         "geometry": event["geo"]["geometry"],
-    #         "properties": {
-    #             "id": event["id"],
-    #             "title": event["title"],
-    #             "phq_attendance": event["phq_attendance"],
-    #         }
-    #     })
-
-    # feature_collection = {
-    #     "type": "FeatureCollection",
-    #     "features": geojson_features,
-    # }
-
-    # st.write(geojson_features)
-
-    # st.write(lat, lon)
-
-    
-
-    # st.dataframe(point_events_df)
     
     st.pydeck_chart(pdk.Deck(
         map_style=None,
@@ -103,29 +66,28 @@ def show_map(lat, lon, events):
         ),
         layers=[
             pdk.Layer(
+                'ScatterplotLayer',
+                data=[{"coordinates": [lon, lat], "radius": radius_meters}],
+                get_position="coordinates",
+                # radius_units="meters",
+                filled=True,
+                # stroked=True,
+                get_color='[24, 161, 99, 40]',
+                get_radius="radius",
+            ),
+            pdk.Layer(
                 "ColumnLayer",
                 data=point_events_df,
                 get_position=["lon", "lat"],
-                # get_position="geometry.coordinates",
-                # line_width_min_pixels=1,
                 auto_highlight=True,
-                # # elevation_scale=50,
                 pickable=True,
-                # elevation_range=[0, 500],
                 extruded=True,
                 get_elevation="phq_attendance / 30",
-                # # coverage=1,
                 opacity=0.8,
                 radius=10,
                 stroked=False,
                 filled=True,
-                # point_type="circle",
-                # # extruded=True,
-                # wireframe=True,
-                # get_elevation="properties.valuePerSqm / 20",
-                # get_fill_color="[phq_attendance / 20, 130, 121, 255]",
                 get_fill_color="fill_color",
-                # get_line_color=[255, 255, 255],
             ),
             # pdk.Layer(
             #     'GeoJsonLayer',
