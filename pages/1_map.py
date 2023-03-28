@@ -1,5 +1,6 @@
 import streamlit as st
-import time
+import datetime
+import requests
 import pandas as pd
 from utils.pages import set_page_config
 from utils.sidebar import show_sidebar_options
@@ -103,7 +104,14 @@ def map():
         previous_phq_attendance_features = fetch_features(location["lat"], location["lon"], radius, date_from=previous_date_from, date_to=previous_date_to, features=features)
         previous_phq_attendance_sum = calc_sum_of_features(previous_phq_attendance_features, features)
 
-        col1, col2, col3, col4 = st.columns(4)
+        # Fetch Demand Surges
+        demand_surges = fetch_demand_surges(location["lat"], location["lon"], radius, date_from=date_from)
+        demand_surges_count = demand_surges["count"] if "count" in demand_surges else 0
+
+        previous_demand_surges = fetch_demand_surges(location["lat"], location["lon"], radius, date_from=previous_date_from)
+        previous_demand_surges_count = previous_demand_surges["count"] if "count" in previous_demand_surges else 0
+
+        col1, col2, col3, col4, col5 = st.columns(5)
 
         with col1:
             st.metric(label="Suggested Radius", value=f"{suggested_radius['radius']}{suggested_radius['radius_unit']}", help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)")
@@ -119,6 +127,10 @@ def map():
         with col4:
             delta_pct = (non_attended_events_sum - previous_non_attended_events_sum) / previous_non_attended_events_sum * 100
             st.metric(label="Non-Attended Events", value=non_attended_events_sum, delta=f"{delta_pct:,.0f}%", help=f"Total number of non-attended events in the selected date range. Previous period: {previous_non_attended_events_sum}.")
+
+        with col5:
+            delta_pct = (demand_surges_count - previous_demand_surges_count) / previous_demand_surges_count * 100
+            st.metric(label="Demand Surges", value=demand_surges_count, delta=f"{delta_pct:,.0f}%", help=f"Number of [Demand Surges](https://docs.predicthq.com/resources/demand-surge) in the next 90 days (Demand Surges are always calculated using a 90d period). Previous period: {previous_demand_surges_count}.")
 
         # Fetch events
         events = fetch_events(location["lat"], location["lon"], radius, date_from=date_from, date_to=date_to, categories=selected_categories)
@@ -184,6 +196,26 @@ def fetch_features(lat, lon, radius, date_from, date_to, features=[], radius_uni
 
     return features.to_dict()
 
+
+@st.cache_data
+def fetch_demand_surges(lat, lon, radius, date_from, min_surge_intensity="m", radius_unit="mi"):
+    r = requests.get(
+        url="https://api.predicthq.com/v1/demand-surge",
+        headers={
+            "Authorization": f"Bearer {get_api_key()}",
+            "Accept": "application/json",
+        },
+        params={
+            "location.origin": f"{lat},{lon}",
+            "location.radius": f"{radius}{radius_unit}",
+            "date_from": date_from,
+            "date_to": date_from + datetime.timedelta(days=90),
+            "min_surge_intensity": min_surge_intensity,
+        },
+        allow_redirects=False
+        )
+
+    return r.json()
 
 @st.cache_data
 def fetch_events(lat, lon, radius, date_from, date_to, categories=[], radius_unit="mi"):
