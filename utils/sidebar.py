@@ -10,21 +10,39 @@ def show_sidebar_options():
     locations = [
         {
             "id": "san-francisco",
-            "name": "San Francisco",
+            "name": "San Francisco, USA",
             "lat": 37.78690,
             "lon": -122.40152
         },
         {
             "id": "new-york",
-            "name": "New York",
+            "name": "New York, USA",
             "lat": 40.71,
             "lon": -74.01
         },
         {
             "id": "los-angeles",
-            "name": "Los Angeles",
+            "name": "Los Angeles, USA",
             "lat": 34.05,
             "lon": -118.24
+        },
+        {
+            "id": "london",
+            "name": "London, UK",
+            "lat": 51.50088,
+            "lon": -0.14098
+        },
+        {
+            "id": "paris",
+            "name": "Paris, FR",
+            "lat": 48.86487,
+            "lon": 2.35002
+        },
+        {
+            "id": "berlin",
+            "name": "Berlin, DE",
+            "lat": 52.50542,
+            "lon": 13.33851
         }
     ]
 
