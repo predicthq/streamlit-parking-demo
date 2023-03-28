@@ -117,19 +117,19 @@ def map():
             st.metric(label="Suggested Radius", value=f"{suggested_radius['radius']}{suggested_radius['radius_unit']}", help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)")
 
         with col2:
-            delta_pct = (phq_attendance_sum - previous_phq_attendance_sum) / previous_phq_attendance_sum * 100
+            delta_pct = ((phq_attendance_sum - previous_phq_attendance_sum) / previous_phq_attendance_sum * 100) if previous_phq_attendance_sum > 0 else 0
             st.metric(label="Predicted Attendance", value=f"{phq_attendance_sum:,.0f}", delta=f"{delta_pct:,.0f}%", help=f"The predicted number of people attending events in the selected date range. Previous period: {previous_phq_attendance_sum:,.0f}.")
 
         with col3:
-            delta_pct = (attended_events_sum - previous_attended_events_sum) / previous_attended_events_sum * 100
+            delta_pct = ((attended_events_sum - previous_attended_events_sum) / previous_attended_events_sum * 100) if previous_attended_events_sum > 0 else 0
             st.metric(label="Attended Events", value=attended_events_sum, delta=f"{delta_pct:,.0f}%", help=f"Total number of attended events in the selected date range. Previous period: {previous_attended_events_sum}.")
         
         with col4:
-            delta_pct = (non_attended_events_sum - previous_non_attended_events_sum) / previous_non_attended_events_sum * 100
+            delta_pct = ((non_attended_events_sum - previous_non_attended_events_sum) / previous_non_attended_events_sum * 100) if previous_non_attended_events_sum > 0 else 0
             st.metric(label="Non-Attended Events", value=non_attended_events_sum, delta=f"{delta_pct:,.0f}%", help=f"Total number of non-attended events in the selected date range. Previous period: {previous_non_attended_events_sum}.")
 
         with col5:
-            delta_pct = (demand_surges_count - previous_demand_surges_count) / previous_demand_surges_count * 100
+            delta_pct = ((demand_surges_count - previous_demand_surges_count) / previous_demand_surges_count * 100) if previous_demand_surges_count > 0 else 0
             st.metric(label="Demand Surges", value=demand_surges_count, delta=f"{delta_pct:,.0f}%", help=f"Number of [Demand Surges](https://docs.predicthq.com/resources/demand-surge) in the next 90 days (Demand Surges are always calculated using a 90d period). Previous period: {previous_demand_surges_count}.")
 
         # Fetch events
