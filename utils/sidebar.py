@@ -3,10 +3,6 @@ import datetime
 from utils.predicthq import get_api_key
 
 def show_sidebar_options():
-    # Prepare the PredictHQ API Key which is required to run the app
-    api_key = st.session_state.api_key if "api_key" in st.session_state else ""
-    st.sidebar.text_input("PredictHQ API Token", value=api_key, help="A [PredictHQ API Token](https://docs.predicthq.com/oauth2/introduction) is required to run the app.", key="api_key")
-
     locations = [
         {
             "id": "san-francisco",
