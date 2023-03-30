@@ -89,8 +89,8 @@ def show_map_sidebar_code_examples():
             "filename": "count_api"
         },
         {
-            "name": "Demand Surges API",
-            "filename": "demand_surges_api"
+            "name": "Demand Surge API",
+            "filename": "demand_surge_api"
         },
         {
             "name": "Search Events",

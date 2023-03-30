@@ -123,4 +123,4 @@ Example response:
 
 The way the total sum of Predicted Attendance is calculated in this app is by requesting the `phq_attendance_*` features, then looping through the results to sum the numbers together.
 
-Full docs for the Suggested Radius API are available at [https://docs.predicthq.com/resources/features](https://docs.predicthq.com/resources/features)
+Full docs for the Features API are available at [https://docs.predicthq.com/resources/features](https://docs.predicthq.com/resources/features)
