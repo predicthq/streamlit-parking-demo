@@ -1,7 +1,13 @@
 # PredictHQ Parking Demo App
 
+This is a [Streamlit](https://streamlit.io) app designed to show how easy it is to get up and running quickly with the PredictHQ APIs. Please feel free to take a copy of this code and modify it for your own use, or take the bits you need to make your integration with PredictHQ easier and faster.
 
-To run locally:
+Learn more about integrating with the PredictHQ APIs at [https://docs.predicthq.com](https://docs.predicthq.com).
+
+
+## Running the app
+
+To run the app locally:
 
 ```
 $ cd streamlit-parking-demo
@@ -11,5 +17,12 @@ $ source .venv/bin/activate
 $ pip install --upgrade pip
 $ pip install -r requirements.txt
 $ 
-$ streamlit run main.py
+$ streamlit run map.py
 ```
+
+You'll need to get an API token by following the instructions at [https://docs.predicthq.com/oauth2/introduction](https://docs.predicthq.com/oauth2/introduction) and create a [Streamlit config](https://docs.streamlit.io/library/advanced-features/configuration) file with the following contents:
+
+```
+api_key = "<your API token>"
+```
+
