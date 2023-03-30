@@ -3,6 +3,8 @@ import datetime
 from utils.predicthq import get_api_key
 
 def show_sidebar_options():
+    
+
     locations = [
         {
             "id": "san-francisco",

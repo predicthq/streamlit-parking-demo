@@ -68,24 +68,23 @@ def show_map(lat, lon, radius_meters, events):
 
             # Center point layer
             pdk.Layer(
-                "ScatterplotLayer",
-                data=[{"coordinates": [lon, lat], "radius": radius_meters}], # Parking icon oinstead of dot, show sidebar with expand/contract here's the code to do X, then Y, then Z
+                "IconLayer", # TODO - IconLayer
+                data=[
+                    {
+                        "coordinates": [lon, lat],
+                        "radius": radius_meters,
+                        "icon_data": {
+                            "url": "app/static/map-icon.png",
+                            "width": 160,
+                            "height": 160,                            
+                        }
+                    }
+                ],
                 get_position="coordinates",
-                filled=True,
-                get_fill_color="[0, 140, 211, 150]",
-                get_radius=40,
+                get_icon="icon_data",
+                get_size=20,
+                pickable=True,
             ),
-
-            # Center point layer
-            # pdk.Layer(
-            #     "TextLayer", # TODO - IconLayer
-            #     data=[{"coordinates": [lon, lat], "radius": radius_meters, "text": "ddd🅿️"}], # Parking icon oinstead of dot, show sidebar with expand/contract here's the code to do X, then Y, then Z. Use markdown files for the code samples
-            #     get_position="coordinates",
-            #     get_text="text",
-            #     filled=True,
-            #     get_fill_color="[0, 140, 211, 150]",
-            #     get_radius=40,
-            # ),
 
             # Point-type events layer
             pdk.Layer(

@@ -67,6 +67,14 @@ def map():
 
     st.sidebar.caption("Get the code for this app at [GitHub](https://github.com/predicthq/streamlit-parking-demo)")
 
+    st.sidebar.markdown("## Code examples")
+    
+    with st.sidebar.expander("Fetch Suggested Radius"):
+        st.code("foo")
+
+    with st.sidebar.expander("Fetch Predicted Attendance"):
+        st.code("<here's the code>")
+
     if daterange is not None:
         date_from = daterange["date_from"]
         date_to = daterange["date_to"]
