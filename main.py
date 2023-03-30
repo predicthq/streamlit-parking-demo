@@ -3,9 +3,8 @@ import datetime
 import requests
 import pandas as pd
 from utils.pages import set_page_config
-from utils.sidebar import show_sidebar_options
+from utils.sidebar import show_sidebar_options, show_map_sidebar_code_examples
 from utils.predicthq import get_api_key, get_predicthq_client
-from utils.data import flatten_dict
 from utils.map import show_map
 
 
@@ -65,15 +64,7 @@ def map():
 
     selected_categories = st.sidebar.multiselect("Event categories", options=categories, default=default_categories, help="[Event Categories Docs](https://docs.predicthq.com/resources/events)")
 
-    st.sidebar.caption("Get the code for this app at [GitHub](https://github.com/predicthq/streamlit-parking-demo)")
-
-    st.sidebar.markdown("## Code examples")
-    
-    with st.sidebar.expander("Fetch Suggested Radius"):
-        st.code("foo")
-
-    with st.sidebar.expander("Fetch Predicted Attendance"):
-        st.code("<here's the code>")
+    show_map_sidebar_code_examples()
 
     if daterange is not None:
         date_from = daterange["date_from"]

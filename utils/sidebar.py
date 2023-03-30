@@ -1,10 +1,10 @@
 import streamlit as st
 import datetime
 from utils.predicthq import get_api_key
+from utils.code_examples import get_code_example
+
 
 def show_sidebar_options():
-    
-
     locations = [
         {
             "id": "san-francisco",
@@ -71,6 +71,42 @@ def show_sidebar_options():
     st.sidebar.selectbox("Date Range", date_options, index=index, format_func=lambda x: x["name"], help="Select the date range for fetching event data.", disabled=get_api_key() is None, key="daterange")
 
 
+def show_map_sidebar_code_examples():
+    st.sidebar.markdown("## Code examples")
+
+    # The code examples are saved as markdown files in docs/code_examples
+    examples = [
+        {
+            "name": "Suggested Radius API",
+            "filename": "suggested_radius_api"
+        },
+        {
+            "name": "Features API (Predicted Attendance aggregation)",
+            "filename": "features_api"
+        },
+        {
+            "name": "Count of Events",
+            "filename": "count_api"
+        },
+        {
+            "name": "Demand Surges API",
+            "filename": "demand_surges_api"
+        },
+        {
+            "name": "Search Events",
+            "filename": "events_api"
+        },
+        {
+            "name": "Python SDK for PredictHQ APIs",
+            "filename": "python_sdk"
+        }
+    ]
+
+    for example in examples:
+        with st.sidebar.expander(example["name"]):
+            st.markdown(get_code_example(example["filename"]))
     
+
+    st.sidebar.caption("Get the code for this app at [GitHub](https://github.com/predicthq/streamlit-parking-demo)")
 
     
