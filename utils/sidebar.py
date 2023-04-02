@@ -1,10 +1,11 @@
 import streamlit as st
 import datetime
-from utils.predicthq import get_api_key
+from utils.predicthq import get_api_key, get_predicthq_client
 from utils.code_examples import get_code_example
 
 
 def show_sidebar_options():
+    # TODO - get list of actual parking buildings across the globe
     locations = [
         {
             "id": "san-francisco",
@@ -24,12 +25,12 @@ def show_sidebar_options():
         if "location" in st.session_state
         else 0
     )
-    st.sidebar.selectbox(
+    location = st.sidebar.selectbox(
         "Parking Building",
         locations,
         index=index,
         format_func=lambda x: x["name"],
-        help="Select the fictional parking building location.",
+        help="Select the parking building location.",
         disabled=get_api_key() is None,
         key="location",
     )
@@ -68,6 +69,32 @@ def show_sidebar_options():
         disabled=get_api_key() is None,
         key="daterange",
     )
+
+    st.session_state.suggested_radius = fetch_suggested_radius(
+        location["lat"], location["lon"]
+    )
+
+    # Allow changing the radius if needed (default to suggested radius)
+    # The Suggested Radius API is used to determine the best radius to use for the given location and industry
+    st.sidebar.slider(
+        "Suggested Radius around parking building (mi)",
+        0.0,
+        10.0,
+        st.session_state.suggested_radius.get("radius", 2.0),
+        0.1,
+        help="[Suggested Radius Docs](https://docs.predicthq.com/resources/suggested-radius)",
+        key="radius",
+    )
+
+
+@st.cache_data
+def fetch_suggested_radius(lat, lon, radius_unit="mi", industry="parking"):
+    phq = get_predicthq_client()
+    suggested_radius = phq.radius.search(
+        location__origin=f"{lat},{lon}", radius_unit=radius_unit, industry=industry
+    )
+
+    return suggested_radius.to_dict()
 
 
 def show_map_sidebar_code_examples():
