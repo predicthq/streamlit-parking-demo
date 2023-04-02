@@ -69,21 +69,33 @@ def map():
     events = fetch_events(
         location["lat"],
         location["lon"],
-        radius,
+        radius=radius,
         date_from=date_from,
         date_to=date_to,
         categories=selected_categories,
+        radius_unit=suggested_radius["radius_unit"],
     )
 
     # Show map and convert radius miles to meters (the map only supports meters)
     show_map(
         lat=location["lat"],
         lon=location["lon"],
-        radius_meters=radius * 1609,
+        radius_meters=calc_meters(radius, suggested_radius["radius_unit"]),
         events=events,
     )
 
     show_events_list(events, f'events-{location["id"]}-{date_from}-to-{date_to}')
+
+
+def calc_meters(value, unit):
+    if unit == "mi":
+        return value * 1609
+    if unit == "ft":
+        return value * 0.3048
+    elif unit == "km":
+        return value * 1000
+    else:
+        return value
 
 
 def show_events_list(events, filename="events"):

@@ -68,13 +68,12 @@ def show_map(lat, lon, radius_meters, events):
                     data=[{"coordinates": [lon, lat], "radius": radius_meters}],
                     get_position="coordinates",
                     filled=True,
-                    # get_fill_color="[24, 161, 99, 40]",
                     get_fill_color="[0, 140, 211, 40]",
                     get_radius="radius",
                 ),
                 # Center point layer
                 pdk.Layer(
-                    "IconLayer",  # TODO - IconLayer
+                    "IconLayer",
                     data=[
                         {
                             "coordinates": [lon, lat],
@@ -89,7 +88,7 @@ def show_map(lat, lon, radius_meters, events):
                     get_position="coordinates",
                     get_icon="icon_data",
                     get_size=20,
-                    pickable=True,
+                    pickable=False,
                 ),
                 # Point-type events layer
                 pdk.Layer(

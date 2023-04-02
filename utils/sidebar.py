@@ -5,26 +5,99 @@ from utils.code_examples import get_code_example
 
 
 def show_sidebar_options():
-    # TODO - get list of actual parking buildings across the globe
     locations = [
         {
             "id": "san-francisco",
-            "name": "San Francisco, USA",
-            "lat": 37.78690,
-            "lon": -122.40152,
+            "name": "San Francisco, US",
+            "address": "30 Fremont St",
+            "lat": 37.79075,
+            "lon": -122.39754,
+            "tz": "America/Los_Angeles",
+            "units": "imperial",
         },
-        {"id": "new-york", "name": "New York, USA", "lat": 40.71, "lon": -74.01},
-        {"id": "los-angeles", "name": "Los Angeles, USA", "lat": 34.05, "lon": -118.24},
-        {"id": "london", "name": "London, UK", "lat": 51.50088, "lon": -0.14098},
-        {"id": "paris", "name": "Paris, FR", "lat": 48.86487, "lon": 2.35002},
-        {"id": "berlin", "name": "Berlin, DE", "lat": 52.50542, "lon": 13.33851},
+        {
+            "id": "new-york",
+            "name": "New York, US",
+            "address": "121 Reade St",
+            "lat": 40.71714,
+            "lon": -74.00969,
+            "tz": "America/New_York",
+            "units": "imperial",
+        },
+        {
+            "id": "los-angeles",
+            "name": "Los Angeles, US",
+            "address": "816 S Figueroa St",
+            "lat": 34.04977,
+            "lon": -118.26218,
+            "tz": "America/Los_Angeles",
+            "units": "imperial",
+        },
+        {
+            "id": "toronto",
+            "name": "Toronto, CA",
+            "address": "200 King Street West",
+            "lat": 43.64812,
+            "lon": -79.38559,
+            "tz": "America/Toronto",
+            "units": "metric",
+        },
+        {
+            "id": "london",
+            "name": "London, UK",
+            "address": "Parker Mews",
+            "lat": 51.51612,
+            "lon": -0.12266,
+            "tz": "Europe/London",
+            "units": "metric",
+        },
+        {
+            "id": "paris",
+            "name": "Paris, FR",
+            "address": "14 Rue Croix des Petits Champs",
+            "lat": 48.86409,
+            "lon": 2.33944,
+            "tz": "Europe/Paris",
+            "units": "metric",
+        },
+        {
+            "id": "berlin",
+            "name": "Berlin, DE",
+            "address": "Leipziger Pl. 12",
+            "lat": 52.51231,
+            "lon": 13.38184,
+            "tz": "Europe/Berlin",
+            "units": "metric",
+        },
+        {
+            "id": "sydney",
+            "name": "Sydney, AU",
+            "address": "Lang St",
+            "lat": -33.86333,
+            "lon": 151.20590,
+            "tz": "Australia/Sydney",
+            "units": "metric",
+        },
+        {
+            "id": "auckland",
+            "name": "Auckland, NZ",
+            "address": "31 Customs Street West",
+            "lat": -36.84316,
+            "lon": 174.76427,
+            "tz": "Pacific/Auckland",
+            "units": "metric",
+        },
     ]
 
-    index = (
-        locations.index(st.session_state.location)
-        if "location" in st.session_state
-        else 0
-    )
+    # Work out which location is currently selected
+    index = 0
+
+    if "location" in st.session_state:
+        for idx, location in enumerate(locations):
+            if st.session_state["location"]["id"] == location["id"]:
+                index = idx
+                break
+
     location = st.sidebar.selectbox(
         "Parking Building",
         locations,
@@ -70,14 +143,19 @@ def show_sidebar_options():
         key="daterange",
     )
 
+    # Use an appropriate radius unit depending on location
+    radius_unit = (
+        "mi" if "units" in location and location["units"] == "imperial" else "km"
+    )
+
     st.session_state.suggested_radius = fetch_suggested_radius(
-        location["lat"], location["lon"]
+        location["lat"], location["lon"], radius_unit=radius_unit
     )
 
     # Allow changing the radius if needed (default to suggested radius)
     # The Suggested Radius API is used to determine the best radius to use for the given location and industry
     st.sidebar.slider(
-        "Suggested Radius around parking building (mi)",
+        f"Suggested Radius around parking building ({radius_unit})",
         0.0,
         10.0,
         st.session_state.suggested_radius.get("radius", 2.0),
