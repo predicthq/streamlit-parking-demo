@@ -114,13 +114,15 @@ def show_events_list(events, filename="events"):
             "title": event["title"],
             "phq_attendance": event["phq_attendance"] if event["phq_attendance"] else 0,
             "category": event["category"],
-            "start_date_local": event["start"].astimezone(
-                pytz.timezone(event["timezone"])
-            ),
-            "end_date_local": event["end"].astimezone(pytz.timezone(event["timezone"])),
-            "predicted_end_date_local": event["predicted_end"].astimezone(
-                pytz.timezone(event["timezone"])
-            )
+            "start_date_local": event["start"]
+            .astimezone(pytz.timezone(event["timezone"]))
+            .isoformat(),
+            "end_date_local": event["end"]
+            .astimezone(pytz.timezone(event["timezone"]))
+            .isoformat(),
+            "predicted_end_date_local": event["predicted_end"]
+            .astimezone(pytz.timezone(event["timezone"]))
+            .isoformat()
             if "predicted_end" in event and event["predicted_end"] is not None
             else "",
             "venue_name": venue["name"] if venue else "",
