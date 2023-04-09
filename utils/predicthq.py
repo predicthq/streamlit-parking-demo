@@ -58,6 +58,10 @@ def get_predicthq_client():
 
 @st.cache_data
 def fetch_features(lat, lon, radius, date_from, date_to, features=[], radius_unit="mi"):
+    """
+    Features API only works with local time, so any date range used is based on the timezone
+    at the location being queried.
+    """
     phq = get_predicthq_client()
     features = phq.features.obtain_features(
         location__geo={
@@ -79,6 +83,9 @@ def fetch_features(lat, lon, radius, date_from, date_to, features=[], radius_uni
 def fetch_demand_surges(
     lat, lon, radius, date_from, date_to, min_surge_intensity="m", radius_unit="mi"
 ):
+    """
+    The Demand Surge API works with local time just like the Features API.
+    """
     r = requests.get(
         url="https://api.predicthq.com/v1/demand-surge",
         headers={
@@ -110,15 +117,24 @@ def fetch_demand_surges(
 
 
 @st.cache_data
-def fetch_events(lat, lon, radius, date_from, date_to, categories=[], radius_unit="mi"):
+def fetch_events(
+    lat, lon, radius, date_from, date_to, tz="UTC", categories=[], radius_unit="mi"
+):
+    """
+    Events API works with UTC time and you can specify a different timezone for the date range
+    but all results are always in UTC so must be converted to the local timezone.
+    """
     phq = get_predicthq_client()
     events = phq.events.search(
         within=f"{radius}{radius_unit}@{lat},{lon}",
-        active__gte=date_from,
-        active__lte=date_to,
+        active={
+            "gte": date_from,
+            "lte": date_to,
+            "tz": tz,
+        },
         category=",".join(categories),
         state="active",
-        limit=100,
+        limit=200,
         sort="phq_attendance",
     )
 
@@ -126,13 +142,16 @@ def fetch_events(lat, lon, radius, date_from, date_to, categories=[], radius_uni
 
 
 @st.cache_data
-def fetch_event_counts(lat, lon, radius, date_from, date_to, radius_unit="mi"):
+def fetch_event_counts(
+    lat, lon, radius, date_from, date_to, tz="UTC", radius_unit="mi"
+):
     phq = get_predicthq_client()
     counts = phq.events.count(
         within=f"{radius}{radius_unit}@{lat},{lon}",
         active={
             "gte": date_from,
             "lte": date_to,
+            "tz": tz,
         },
         state="active",
     )

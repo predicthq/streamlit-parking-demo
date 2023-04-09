@@ -1,6 +1,5 @@
 import streamlit as st
-import datetime
-import requests
+import pytz
 import pandas as pd
 from utils.pages import set_page_config
 from utils.sidebar import show_sidebar_options, show_map_sidebar_code_examples
@@ -72,6 +71,7 @@ def map():
         radius=radius,
         date_from=date_from,
         date_to=date_to,
+        tz=location["tz"],
         categories=selected_categories,
         radius_unit=suggested_radius["radius_unit"],
     )
@@ -99,6 +99,9 @@ def calc_meters(value, unit):
 
 
 def show_events_list(events, filename="events"):
+    """
+    We're also converting start/end times to local timezone here from UTC.
+    """
     results = []
 
     for event in events["results"]:
@@ -111,9 +114,15 @@ def show_events_list(events, filename="events"):
             "title": event["title"],
             "phq_attendance": event["phq_attendance"] if event["phq_attendance"] else 0,
             "category": event["category"],
-            "start_date": event["start"],  # TODO convert from UTC to local
-            "end_date": event["end"],
-            "predicted_end_date": event["predicted_end"],
+            "start_date_local": event["start"].astimezone(
+                pytz.timezone(event["timezone"])
+            ),
+            "end_date_local": event["end"].astimezone(pytz.timezone(event["timezone"])),
+            "predicted_end_date_local": event["predicted_end"].astimezone(
+                pytz.timezone(event["timezone"])
+            )
+            if "predicted_end" in event and event["predicted_end"] is not None
+            else "",
             "venue_name": venue["name"] if venue else "",
             "venue_address": venue["formatted_address"] if venue else "",
             "placekey": event["geo"]["placekey"]
@@ -128,7 +137,6 @@ def show_events_list(events, filename="events"):
 
     @st.cache_data
     def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode("utf-8")
 
     csv = convert_df(events_df)

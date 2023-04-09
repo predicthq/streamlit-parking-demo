@@ -1,6 +1,5 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 from utils.pages import set_page_config
 from utils.sidebar import show_sidebar_options

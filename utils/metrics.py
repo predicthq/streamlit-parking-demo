@@ -77,6 +77,7 @@ def show_metrics():
             radius,
             date_from=date_from,
             date_to=date_to,
+            tz=location["tz"],
         )
         attended_events_sum = calc_sum_of_event_counts(counts, ATTENDED_CATEGORIES)
         non_attended_events_sum = calc_sum_of_event_counts(
@@ -90,6 +91,7 @@ def show_metrics():
             radius,
             date_from=previous_date_from,
             date_to=previous_date_to,
+            tz=location["tz"],
         )
         previous_attended_events_sum = calc_sum_of_event_counts(
             previous_counts, ATTENDED_CATEGORIES
